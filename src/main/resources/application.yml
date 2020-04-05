@@ -1,0 +1,23 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 123456
+    url: jdbc:mysql://127.0.0.1:3306/hy_info?characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8
+  jpa:
+    show-sql: true
+  redis:
+    host: 192.168.1.108
+    port: 6379
+#打印使用了mybatis后产生的sql语句
+logging:
+  level:
+    com:
+      mc:
+        hyxinfo:
+          dataobject:
+            mapper: trace
+server:
+  servlet:
+    context-path: /hyxinfo
+

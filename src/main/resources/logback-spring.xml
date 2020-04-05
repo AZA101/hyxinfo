@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+    <!--&lt;!&ndash; 配置控制台的输出&ndash;&gt;  appender为小的配置项-->
+    <appender name="consoleLog" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>
+                %d - %msg%n
+            </pattern>
+        </layout>
+    </appender>
+    <!--appender附加器配置文件打印到控制台输出 Info类日志文件-->
+    <appender name="fileInfoLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <!-- 如果匹配起来就拒绝-->
+            <onMatch>DENY</onMatch>
+            <!--如果匹配不起来就接收-->
+            <onMismatch>ACCEPT</onMismatch>
+        </filter>
+        <encoder>
+            <pattern>
+                %msg%n
+            </pattern>
+        </encoder>
+        <!--滚动策略-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 日志文件存放的路径-->
+            <fileNamePattern>E:\IdeaSellLog\var\info.%d.log</fileNamePattern>
+            <!--保留最近15天的日志和设置日志大小的上限-->
+            <maxHistory>15</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+    <!--Error类日志文件-->
+    <appender name="fileErrorLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+        <encoder>
+            <pattern>
+                %msg%n
+            </pattern>
+        </encoder>
+        <!--滚动策略-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 日志文件存放的路径-->
+            <fileNamePattern>E:\IdeaSellLog\var\error.%d.log</fileNamePattern>
+            <maxHistory>15</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+    <!-- 配置用在整个项目上-->
+    <root level="info">
+        <appender-ref ref="consoleLog"></appender-ref>
+        <appender-ref ref="fileInfoLog"></appender-ref>
+        <appender-ref ref="fileErrorLog"></appender-ref>
+    </root>
+</configuration>
