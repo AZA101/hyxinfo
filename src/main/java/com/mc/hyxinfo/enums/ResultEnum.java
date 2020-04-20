@@ -12,7 +12,9 @@ public enum ResultEnum {
     PARAM_ERROR(4,"参数不正确"),
     PARAM_NOT_EXIST(5,"货运单号不能为空"),
     USER_NOT_EXIST(6,"用户不存在"),
-    LOGOUT_SUCCESS(7,"退出成功")
+    LOGOUT_SUCCESS(7,"退出成功"),
+    FORM_DATA_ERROR(8,"表单数据类型不正确"),
+    COOKIE_ERROR(9,"未查询到cookie值或cookie内容为空")
     ;
 
     private Integer code;

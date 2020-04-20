@@ -25,4 +25,9 @@ public class PeopleServiceImpl implements PeopleService {
     public PeopleInfo findByPhoneNumberAndPasswords(String phoneNumber, String passwords) {
         return repository.findByPhoneNumberAndPasswords(phoneNumber,passwords);
     }
+
+    @Override
+    public PeopleInfo findByPhoneNumber(String phoneNumber) {
+        return repository.findByPhoneNumber(phoneNumber);
+    }
 }

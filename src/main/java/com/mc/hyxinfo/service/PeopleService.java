@@ -11,4 +11,5 @@ public interface PeopleService {
     PeopleInfo findOne (String username);
     List<PeopleInfo> findAll();
     PeopleInfo findByPhoneNumberAndPasswords(String phoneNumber,String passwords);
+    PeopleInfo findByPhoneNumber(String phoneNumber);
 }

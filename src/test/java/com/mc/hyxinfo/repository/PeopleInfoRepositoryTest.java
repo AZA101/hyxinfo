@@ -54,4 +54,11 @@ public class PeopleInfoRepositoryTest {
         Assert.assertNotNull(result);
     }
 
+    @Test
+    public void findByPhoneNumberTest(){
+        PeopleInfo result=repository.findByPhoneNumber("13987537730");
+        System.out.println(result);
+        Assert.assertNotNull(result);
+    }
+
 }

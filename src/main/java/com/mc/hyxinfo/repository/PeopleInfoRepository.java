@@ -9,4 +9,5 @@ public interface PeopleInfoRepository extends JpaRepository<PeopleInfo,Integer> 
     List<PeopleInfo> findByUsernameIn (List<String> usernameList);
     PeopleInfo findByUsername(String username);
     PeopleInfo findByPhoneNumberAndPasswords(String phoneNumber,String passwords);
+    PeopleInfo findByPhoneNumber(String phoneNumber);
 }

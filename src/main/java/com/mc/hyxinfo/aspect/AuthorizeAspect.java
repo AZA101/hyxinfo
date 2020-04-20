@@ -21,7 +21,8 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * 通过aop去验证是否已经登陆，列出需要验证的操作
- *
+ * @Aspect 注解把当前类标识为一个切面供容器读取
+ * @Component 把普通pojo实例化到spring容器中
  * @author admin
  */
 @Aspect
@@ -30,7 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 public class AuthorizeAspect {
     @Autowired
     private StringRedisTemplate redisTemplate;
-    /*添加切入点*/
+    /*添加切入点，填写切入点的范围*/
     @Pointcut("execution(public * com.mc.hyxinfo.Controller.EmpTransportDataController.*(..))" +
             "&& !execution(public * com.mc.hyxinfo.Controller.UserController.*(..))")
     public void verify() {
