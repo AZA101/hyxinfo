@@ -1,6 +1,8 @@
 package com.mc.hyxinfo.service;
 
 import com.mc.hyxinfo.dataobject.PeopleInfo;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -12,4 +14,6 @@ public interface PeopleService {
     List<PeopleInfo> findAll();
     PeopleInfo findByPhoneNumberAndPasswords(String phoneNumber,String passwords);
     PeopleInfo findByPhoneNumber(String phoneNumber);
+    Page<PeopleInfo>findList(Pageable pageable);
+    PeopleInfo findByPersonId(Integer personid);
 }

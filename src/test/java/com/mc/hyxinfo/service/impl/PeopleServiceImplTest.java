@@ -34,4 +34,10 @@ public class PeopleServiceImplTest {
         PeopleInfo result=peopleService.findByPhoneNumberAndPasswords("13987537730","222");
         Assert.assertNotNull(result);
     }
+    @Test
+    public void findPersonIdTest(){
+        PeopleInfo result=peopleService.findByPersonId(1);
+        System.out.println(result);
+        Assert.assertNotNull(result);
+    }
 }

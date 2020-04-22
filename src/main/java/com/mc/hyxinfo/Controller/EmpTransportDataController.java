@@ -145,6 +145,4 @@ public class EmpTransportDataController {
         return new ModelAndView("common/test");
     }
 
-
-
 }

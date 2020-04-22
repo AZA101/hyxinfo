@@ -30,7 +30,7 @@ public class PeopleInfo {
     /*用户级别*/
     private Integer levels= LevelEnum.EMP.getCode();
     /*创建时间*/
-   // private Date createTime;
+    private Date createTime;
     /*更改时间*/
    // private Date updateTime;
     /*删除标识*/

@@ -4,6 +4,7 @@ import com.mc.hyxinfo.Util.CookieUtil;
 import com.mc.hyxinfo.constant.CookieConstant;
 import com.mc.hyxinfo.constant.RedisConstant;
 import com.mc.hyxinfo.dataobject.PeopleInfo;
+import com.mc.hyxinfo.enums.LevelEnum;
 import com.mc.hyxinfo.enums.ResultEnum;
 import com.mc.hyxinfo.form.LoginForm;
 import com.mc.hyxinfo.service.PeopleService;
@@ -58,6 +59,10 @@ public class UserController {
         redisTemplate.opsForValue().set(String.format(RedisConstant.TOKEN_PREFIX, token), form.getPhoneNumber(), expire, TimeUnit.SECONDS);
         /*设置token到cookie中*/
         CookieUtil.set(response, CookieConstant.TOKEN, token, CookieConstant.EXPIRE);
+        /*对登陆的账号进行判断，看是管理员还是普通员工*/
+        if(peopleInfo.getLevels()== LevelEnum.admin.getCode()){
+            return new ModelAndView("redirect:" + url + "/hyxinfo/people/list");
+        }
         return new ModelAndView("redirect:" + url + "/hyxinfo/emp/data/list");
     }
 
