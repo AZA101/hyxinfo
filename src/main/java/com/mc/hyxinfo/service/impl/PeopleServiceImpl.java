@@ -33,11 +33,12 @@ public class PeopleServiceImpl implements PeopleService {
         Page<PeopleInfo>peopleInfoPage=repository.findAll(pageable);
         //TODO 必须将peopleInfoPage.getContent()转化为arraylist，否则没有remove方法，也就不存在调用
         List<PeopleInfo>list=new ArrayList<>(peopleInfoPage.getContent()) ;
-      //筛选出员工的信息
+      /*筛选出员工的信息*/
         for (int i=0;i<list.size();i++) {
             if(list.get(i).getLevels()== LevelEnum.admin.getCode()){
                 list.remove(i);
             }
+            /*筛掉打了删除标记的员工信息*/
             if(list.get(i).getDel()!= DataEnum.NORMAL.getCode()){
                 list.remove(i);
             }

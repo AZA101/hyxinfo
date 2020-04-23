@@ -16,7 +16,8 @@ public enum ResultEnum {
     FORM_DATA_ERROR(8,"表单数据类型不正确"),
     COOKIE_ERROR(9,"未查询到cookie值或cookie内容为空"),
     DELETE_FALL(10,"数据删除失败"),
-    DELETE_SUCCESS(11,"数据删除成功")
+    DELETE_SUCCESS(11,"数据删除成功"),
+    POWER_(12,"普通权限不能新增人员信息")
     ;
 
     private Integer code;
