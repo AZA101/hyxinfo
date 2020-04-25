@@ -1,16 +1,17 @@
 package com.mc.hyxinfo.Controller;
 
 
-import com.mc.hyxinfo.Util.CookieUtil;
-import com.mc.hyxinfo.constant.CookieConstant;
-import com.mc.hyxinfo.constant.RedisConstant;
+
+import com.mc.hyxinfo.dataobject.EmpTransportData;
 import com.mc.hyxinfo.dataobject.PeopleInfo;
 import com.mc.hyxinfo.enums.DataEnum;
-import com.mc.hyxinfo.enums.LevelEnum;
 import com.mc.hyxinfo.enums.ResultEnum;
+import com.mc.hyxinfo.exception.ReturnException;
 import com.mc.hyxinfo.form.UserForm;
 import com.mc.hyxinfo.repository.PeopleInfoRepository;
+import com.mc.hyxinfo.service.EmpTransportDataService;
 import com.mc.hyxinfo.service.PeopleService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,9 +24,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
+
 import javax.validation.Valid;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -41,10 +44,15 @@ public class PeopleDataController {
     private PeopleInfoRepository peopleInfoRepository;
     @Autowired
     private StringRedisTemplate redisTemplate;
+    @Autowired
+    private EmpTransportDataService empTransportDataService;
+
+    SimpleDateFormat  df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private String nowTime = df.format(new Date());
+    Timestamp dates =Timestamp.valueOf(nowTime);//把时间转换
 
     /**
-     * 查询所有的员工数据
-     *
+     * 查询员工列表
      * @param page
      * @param size
      * @param map
@@ -64,7 +72,6 @@ public class PeopleDataController {
 
     /**
      * 删除员工数据
-     *
      * @param personId
      * @param map
      * @return
@@ -101,55 +108,88 @@ public class PeopleDataController {
     /**
      * 新增修改人员信息
      * @param personId
-     * @param request
      * @param map
      * @return
      */
     @GetMapping("/index")
     public ModelAndView indexData(@RequestParam(value = "personId", required = false) Integer personId,
-                                  HttpServletRequest request,
                                   Map<String, Object> map) {
 
-        /*获取人员信息，如电话号码，先获取cookie中token,利用token从redis中获取value值*/
-        Cookie cookie = CookieUtil.get(request, CookieConstant.TOKEN);
-        String Telephone;
-        PeopleInfo peopleInfo = new PeopleInfo();
-        if (cookie != null) {
-            Telephone = redisTemplate.opsForValue().get(String.format(RedisConstant.TOKEN_PREFIX, cookie.getValue()));
-            peopleInfo = peopleService.findByPhoneNumber(Telephone);
+        if(personId!=null&&!"".equals(personId)){
+           PeopleInfo peopleInfo=peopleService.findByPersonId(personId);
+            map.put("peopleInfo",peopleInfo);
+            return new ModelAndView("peopleData/updatePeople", map);
         }
-        /*只有管理员才能新增人员信息*/
-        if (peopleInfo.getLevels() == LevelEnum.EMP.getCode()) {
-            if (personId != null) {
-                PeopleInfo Info = peopleService.findByPersonId(personId);
-                map.put("peopleInfo", Info);
-                return new ModelAndView("peopleData/updatePeople", map);
-            } else {
-                map.put("msg", ResultEnum.PARAM_ERROR.getMsg());
-                map.put("url", "/hyxinfo/emp/data/list");
-                return new ModelAndView("common/error", map);
-            }
-        } else {
-            if (personId != null) {
-                PeopleInfo Info = peopleService.findByPersonId(personId);
-                map.put("peopleInfo", Info);
-                return new ModelAndView("peopleData/updatePeople", map);
-            } else {
-                map.put("peopleInfo", null);
-                return new ModelAndView("peopleData/updatePeople", map);
-            }
-        }
+        map.put("peopleInfo",null);
+        return new ModelAndView("peopleData/updatePeople",map);
     }
 
-
+    /**
+     * 保存人员信息
+     * @param form
+     * @param bindingResult
+     * @param map
+     * @return
+     */
     @PostMapping("/save")
     public ModelAndView saveData(@Valid UserForm form,
-                                   BindingResult bindingResult,
-                                   Map<String, Object> map) {
+                                 BindingResult bindingResult,
+                                 Map<String, Object> map) {
 
-
-        return new ModelAndView();
+        if (bindingResult.hasErrors()) {
+            map.put("msg", bindingResult.getFieldError().getDefaultMessage());
+            map.put("url", "/hyxinfo/people/index?personId=" + form.getPersonId());
+            return new ModelAndView("common/error", map);
+        }
+        try {
+            if (form.getPersonId() != null && !"".equals(form.getPersonId())) {
+                PeopleInfo peopleInfo = peopleService.findByPersonId(form.getPersonId());
+                BeanUtils.copyProperties(form, peopleInfo);
+                peopleService.save(peopleInfo);
+            }//新增人员信息
+            else if ((form.getPersonId() == null || "".equals(form.getPersonId()))
+                    && !form.getUsername().isEmpty()
+                    && !form.getPhoneNumber().isEmpty()
+                    && !form.getSigns().isEmpty()
+                    && !form.getSigns().isEmpty()) {
+                /*将前端的信息赋值到PeopleInfo中*/
+                PeopleInfo peopleInfo=new PeopleInfo();
+                BeanUtils.copyProperties(form,peopleInfo);
+                peopleInfo.setCreateTime(dates);
+                peopleService.save(peopleInfo);
+            }else{
+                map.put("msg",ResultEnum.FORM_DATA_ERROR.getMsg() );
+                map.put("url","/hyxinfo/people/index?personId="+form.getPersonId());
+                return new ModelAndView("common/error",map);
+            }
+        } catch (ReturnException e) {
+            map.put("msg",ResultEnum.FORM_DATA_ERROR.getMsg() );
+            map.put("url","/hyxinfo/people/index?personId="+form.getPersonId());
+            return new ModelAndView("common/error",map);
+        }
+         /*操作成功提示*/
+        map.put("msg", ResultEnum.SUCCESS.getMsg());
+        map.put("url", "/hyxinfo/people/list");
+        return new ModelAndView("common/success", map);
     }
 
+    /**
+     * 查询员工的运输数据
+     * @param page
+     * @param size
+     * @param map
+     * @return
+     */
+    @GetMapping("transportList")
+    public ModelAndView transportList(@RequestParam(value = "page", defaultValue = "1") Integer page,
+                                      @RequestParam(value = "size", defaultValue = "10") Integer size,
+                                      Map<String,Object>map){
+        PageRequest request = PageRequest.of(page - 1, size);
+        Page<EmpTransportData> empDataPage=empTransportDataService.findList(request);
+        map.put("empDataPage",empDataPage);
+        map.put("empPage",page);
+        map.put("size",size);
+        return new ModelAndView("peopleData/transportList",map);
+    }
 
 }

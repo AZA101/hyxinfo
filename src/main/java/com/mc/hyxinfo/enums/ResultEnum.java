@@ -17,7 +17,9 @@ public enum ResultEnum {
     COOKIE_ERROR(9,"未查询到cookie值或cookie内容为空"),
     DELETE_FALL(10,"数据删除失败"),
     DELETE_SUCCESS(11,"数据删除成功"),
-    POWER_(12,"普通权限不能新增人员信息")
+    POWER_NOT_NULL(12,"普通权限不能新增人员信息"),
+    PERSONID_NOT_NULL(13,"用户id不能为空")
+
     ;
 
     private Integer code;

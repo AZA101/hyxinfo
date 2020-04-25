@@ -1,6 +1,6 @@
 package com.mc.hyxinfo.handler;
 
-import com.mc.hyxinfo.exception.AuthorizeException;
+import com.mc.hyxinfo.exception.AuthorityException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.ModelAndView;
@@ -12,10 +12,9 @@ import org.springframework.web.servlet.ModelAndView;
  * 当将异常抛到controller时,可以对异常进行统一处理,规定返回的json格式或是跳转到一个错误页面
  */
 @ControllerAdvice
-public class AuthorizeExceptionHandler {
-
+public class AuthorityExceptionHandler {
     private String url="http://127.0.0.1:8080";
-    @ExceptionHandler(value = AuthorizeException.class)
+    @ExceptionHandler(value = AuthorityException.class)
     public ModelAndView handlerAuthorizeException() {
         return new ModelAndView("redirect:"
                 .concat(url)

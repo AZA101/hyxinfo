@@ -16,4 +16,5 @@ public interface PeopleService {
     PeopleInfo findByPhoneNumber(String phoneNumber);
     Page<PeopleInfo>findList(Pageable pageable);
     PeopleInfo findByPersonId(Integer personid);
+    PeopleInfo save(PeopleInfo peopleInfo);
 }

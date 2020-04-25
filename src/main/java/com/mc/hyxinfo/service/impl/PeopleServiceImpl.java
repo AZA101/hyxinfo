@@ -27,6 +27,11 @@ public class PeopleServiceImpl implements PeopleService {
         return repository.findByPersonId(personid);
     }
 
+    @Override
+    public PeopleInfo save(PeopleInfo peopleInfo) {
+        return repository.save(peopleInfo);
+    }
+
     /*分页查询所有的记录*/
     @Override
     public Page<PeopleInfo> findList(Pageable pageable) {

@@ -9,6 +9,7 @@ import com.mc.hyxinfo.dataobject.PeopleInfo;
 import com.mc.hyxinfo.enums.ResultEnum;
 import com.mc.hyxinfo.exception.ReturnException;
 import com.mc.hyxinfo.form.EmpForm;
+import com.mc.hyxinfo.form.UserForm;
 import com.mc.hyxinfo.service.EmpTransportDataService;
 import com.mc.hyxinfo.service.PeopleService;
 import org.springframework.beans.BeanUtils;
@@ -139,6 +140,55 @@ public class EmpTransportDataController {
         map.put("url","/hyxinfo/emp/data/list");
         return new ModelAndView("common/success",map);
     }
+
+    /**
+     * 修改个人信息
+     * @param
+     * @param map
+     * @return
+     */
+    @GetMapping("/alter")
+    public ModelAndView alterData(HttpServletRequest request,
+                                  Map<String,Object>map){
+        /*通过cookie和redis查询token,利用token查询个人信息*/
+        Cookie cookie = CookieUtil.get(request, CookieConstant.TOKEN);
+        if(cookie!=null){
+            String Telephone = redisTemplate.opsForValue().get(String.format(RedisConstant.TOKEN_PREFIX, cookie.getValue()));
+            PeopleInfo peopleInfo = peopleService.findByPhoneNumber(Telephone);
+            if(peopleInfo.getPersonId()!=null && !"".equals(peopleInfo.getPersonId())){
+                PeopleInfo info=peopleService.findByPersonId(peopleInfo.getPersonId());
+                map.put("peopleInfo",info);
+                return new ModelAndView("empData/empInfo", map);
+            }
+        }
+            map.put("msg",ResultEnum.PERSONID_NOT_NULL.getMsg() );
+            map.put("url", "/hyxinfo/emp/data/list");
+            return new ModelAndView("common/error", map);
+    }
+
+    @PostMapping("/update")
+     public ModelAndView updateData(@Valid UserForm form,
+                                    BindingResult bindingResult,
+                                    Map<String, Object> map){
+        if(bindingResult.hasErrors()){
+            map.put("msg", bindingResult.getFieldError().getDefaultMessage());
+            map.put("url", "/hyxinfo/emp/data/list");
+            return new ModelAndView("common/error", map);
+        }
+        if (form.getPersonId() == null || "".equals(form.getPersonId())) {
+            map.put("msg",ResultEnum.PERSONID_NOT_NULL.getMsg() );
+            map.put("url","/hyxinfo/emp/data/list");
+            return new ModelAndView("common/error",map);
+        }
+        PeopleInfo peopleInfo = peopleService.findByPersonId(form.getPersonId());
+        BeanUtils.copyProperties(form, peopleInfo);
+        peopleService.save(peopleInfo);
+        map.put("msg", ResultEnum.SUCCESS.getMsg());
+        map.put("url", "/hyxinfo/emp/data/alter");
+        return new ModelAndView("common/success", map);
+    }
+
+
 
     @GetMapping("/test")
         public ModelAndView test(){
