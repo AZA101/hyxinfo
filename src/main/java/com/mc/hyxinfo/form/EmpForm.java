@@ -13,7 +13,6 @@ import java.util.Date;
 @Data
 public class EmpForm {
     private String billId;
-    @NotEmpty
     private Double weights;
     @NotEmpty
     private String address;

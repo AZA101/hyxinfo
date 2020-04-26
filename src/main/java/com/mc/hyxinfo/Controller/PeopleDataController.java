@@ -7,6 +7,7 @@ import com.mc.hyxinfo.dataobject.PeopleInfo;
 import com.mc.hyxinfo.enums.DataEnum;
 import com.mc.hyxinfo.enums.ResultEnum;
 import com.mc.hyxinfo.exception.ReturnException;
+import com.mc.hyxinfo.form.EmpForm;
 import com.mc.hyxinfo.form.UserForm;
 import com.mc.hyxinfo.repository.PeopleInfoRepository;
 import com.mc.hyxinfo.service.EmpTransportDataService;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -49,7 +51,7 @@ public class PeopleDataController {
 
     SimpleDateFormat  df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private String nowTime = df.format(new Date());
-    Timestamp dates =Timestamp.valueOf(nowTime);//把时间转换
+    Timestamp dates =Timestamp.valueOf(nowTime);//把时间转换成Date类型
 
     /**
      * 查询员工列表
@@ -190,6 +192,84 @@ public class PeopleDataController {
         map.put("empPage",page);
         map.put("size",size);
         return new ModelAndView("peopleData/transportList",map);
+    }
+
+    /**
+     * 删除运输数据
+     * @param billId
+     * @param map
+     * @return
+     */
+    @GetMapping("/deleteList")
+    public ModelAndView deleteList(@RequestParam(value = "billId", required = false) String billId,
+                                   Map<String,Object>map){
+        if(StringUtils.isEmpty(billId)){
+            map.put("msg",ResultEnum.PARAM_NOT_EXIST.getMsg() );
+            map.put("url", "/hyxinfo/people/transportList");
+            return new ModelAndView("common/error", map);
+        }
+        EmpTransportData empTransportData=empTransportDataService.findByBillId(billId);
+        empTransportData.setDel(DataEnum.DEl.getCode());
+        EmpTransportData empdata=empTransportDataService.save(empTransportData);
+        if(empdata!=null){
+            map.put("msg", ResultEnum.SUCCESS.getMsg());
+            map.put("url", "/hyxinfo/people/transportList");
+            return new ModelAndView("common/success", map);
+        }
+        map.put("msg", ResultEnum.UPDATE_FALL.getMsg());
+        map.put("url", "/hyxinfo/people/transportList");
+        return new ModelAndView("common/error", map);
+
+    }
+
+    /**
+     * 选择需要修改的货运数据
+     * @param billId
+     * @param map
+     * @return
+     */
+    @GetMapping("/indexList")
+    public ModelAndView indexList(@RequestParam(value = "billId",required = false) String billId,
+                                  Map<String,Object>map){
+        if(!StringUtils.isEmpty(billId)){
+            EmpTransportData empTransportData=empTransportDataService.findByBillId(billId);
+            map.put("empData",empTransportData);
+            return new ModelAndView("peopleData/indexList",map);
+        }
+        map.put("msg", ResultEnum.PARAM_NOT_EXIST.getMsg());
+        map.put("url", "/hyxinfo/people/transportList");
+        return new ModelAndView("common/error", map);
+    }
+
+    /**
+     * 保存修改的运输数据
+     * @param form
+     * @param bindingResult
+     * @param map
+     * @return
+     */
+    @PostMapping("/saveList")
+    public ModelAndView saveList(@Valid EmpForm form,
+                                 BindingResult bindingResult,
+                                 Map<String,Object>map){
+        if(bindingResult.hasErrors()){
+            map.put("msg", bindingResult.getFieldError().getDefaultMessage());
+            map.put("url","/hyxinfo/people/indexList?billId="+form.getBillId());
+            return new ModelAndView("common/error",map);
+        }
+        if(form.getBillId()!=null && !form.getBillId().isEmpty()){
+            EmpTransportData empTransportData=empTransportDataService.findByBillId(form.getBillId());
+            BeanUtils.copyProperties(form,empTransportData);
+            EmpTransportData empdata=empTransportDataService.save(empTransportData);
+            if(empdata!=null){
+                map.put("msg", ResultEnum.SUCCESS.getMsg());
+                map.put("url","/hyxinfo/people/transportList");
+                return new ModelAndView("common/success",map);
+            }
+        }
+        map.put("msg", ResultEnum.PARAM_NOT_EXIST.getMsg());
+        map.put("url", "/hyxinfo/people/transportList");
+        return new ModelAndView("common/error", map);
     }
 
 }

@@ -1,5 +1,6 @@
 <html>
 <#include "../common/header.ftl">
+<script type="text/javascript" language="javascript" src="/hyxinfo/js/peopleJs.js"></script>
 <body>
 <div id="wrapper" class="toggled">
     <#--添加侧边栏-->
@@ -30,8 +31,8 @@
                                 <td>${empTD.weights}</td>
                                 <td>${empTD.address}</td>
                                 <td>${(empTD.createTime?string("yyyy-MM-dd HH:mm:ss"))!}</td>
-                                <td><a href="">修改</a></td>
-                                <td><a href="">删除</a></td>
+                                <td><a href="/hyxinfo/people/indexList?billId=${empTD.billId}">修改</a></td>
+                                <td><a onclick='return confirmAct();' href="/hyxinfo/people/deleteList?billId=${empTD.billId}">删除</a></td>
                             </tr>
                         </#list>
                         </tbody>

@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 @Service
 public class PeopleServiceImpl implements PeopleService {
@@ -38,14 +39,16 @@ public class PeopleServiceImpl implements PeopleService {
         Page<PeopleInfo>peopleInfoPage=repository.findAll(pageable);
         //TODO 必须将peopleInfoPage.getContent()转化为arraylist，否则没有remove方法，也就不存在调用
         List<PeopleInfo>list=new ArrayList<>(peopleInfoPage.getContent()) ;
-      /*筛选出员工的信息*/
-        for (int i=0;i<list.size();i++) {
-            if(list.get(i).getLevels()== LevelEnum.admin.getCode()){
-                list.remove(i);
-            }
-            /*筛掉打了删除标记的员工信息*/
-            if(list.get(i).getDel()!= DataEnum.NORMAL.getCode()){
-                list.remove(i);
+
+        Iterator<PeopleInfo> it = list.iterator();
+        while(it.hasNext()){
+            PeopleInfo x = it.next();
+            /*筛选出员工的信息*/
+            if(x.getLevels()==LevelEnum.admin.getCode()){
+                it.remove();
+                /*筛掉打了删除标记的员工信息*/
+            }else if(x.getDel()!=DataEnum.NORMAL.getCode()){
+                it.remove();
             }
         }
         /*按照创建时间进行倒序排序*/
